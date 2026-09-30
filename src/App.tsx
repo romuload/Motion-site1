@@ -47,7 +47,7 @@ export default function App() {
   const [buttonsVisible, setButtonsVisible] = useState(false);
   const [copied, setCopied] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [videoSrc, setVideoSrc] = useState<string>('/background.mp4');
+  const [videoSrc, setVideoSrc] = useState<string>(`${import.meta.env.BASE_URL}background.mp4`);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -258,7 +258,7 @@ export default function App() {
         {/* Logo (left) */}
         <div className="flex items-center gap-3">
           <a
-            href="/"
+            href={import.meta.env.BASE_URL}
             style={{ fontFamily: 'var(--font-heading)' }}
             className="text-[21px] font-medium leading-none tracking-tight text-white sm:text-[26px]"
           >
