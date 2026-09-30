@@ -114,6 +114,27 @@ export default function App() {
 
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
 
+    // Mobile browsers (iOS Safari especially) ignore preload and won't fetch or
+    // paint any frame until play() is called. Prime it with a muted play/pause,
+    // and retry on first touch in case autoplay is blocked (e.g. Low Power Mode).
+    let primed = false;
+    const primeVideo = () => {
+      if (primed) return;
+      const playPromise = video.play();
+      if (!playPromise) return;
+      playPromise
+        .then(() => {
+          primed = true;
+          video.pause();
+          window.removeEventListener('touchstart', primeVideo);
+        })
+        .catch(() => {
+          // autoplay blocked; the touchstart listener will retry
+        });
+    };
+    primeVideo();
+    window.addEventListener('touchstart', primeVideo, { passive: true });
+
     const handleMouseMove = (e: MouseEvent) => {
       if (!video || !video.duration || Number.isNaN(video.duration)) return;
 
@@ -173,6 +194,7 @@ export default function App() {
 
     return () => {
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      window.removeEventListener('touchstart', primeVideo);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('touchmove', handleTouchMove);
